@@ -6,7 +6,7 @@
 }
 
 .inputs {
-  width: 450px;
+  width: 350px;
   gap: 10px;
 }
 
@@ -23,13 +23,13 @@
 
 .app-container label input {
   color: black;
-  width: 60%;
+  width: 70%;
   padding-left: 5px;
   height: 35px;
 }
 
 .app-container label textarea {
-  width: 60%; 
+  width: 70%; 
 }
 
 .app-container button {
@@ -54,7 +54,7 @@
 }
 
 .chat-container {
-  width: 450px;
+  width: 350px;
   padding: 5px;
   height: 450px;
   overflow-y: auto;
