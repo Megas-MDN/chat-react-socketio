@@ -1,15 +1,18 @@
 import './App.css';
 import { useEffect, useState } from 'react';
 import io from 'socket.io-client';
-// import Login from './components/Login';
-// import './components/Login.css';
-// import SingUp from './components/SingUp';
+import { FaGithub } from 'react-icons/fa';
+
+const MAX_LENG = 45;
+const MAX_NAME = 14;
 
 const socket = io('https://minichat-socket-io.onrender.com/');
 
 function App() {
   const [name, setName] = useState('');
   const [message, setMessage] = useState('');
+  const [isDisabled, setIsDisabled] = useState(true);
+  const [btnDisabled, setBtnDisabled] = useState(true);
   const [chat, setChat] = useState([]);
 
   useEffect(() => {
@@ -34,11 +37,22 @@ function App() {
       {
         id: 'Me',
         from: name,
-        body: message,
+        body: cropText(message),
       },
       ...chat,
     ]);
     setMessage('');
+    setBtnDisabled(true);
+  };
+
+  const cropText = (str) => {
+    const arrText = str.split('');
+    return arrText.reduce((a, b, i) => {
+      if (i <= MAX_LENG) {
+        return a + b;
+      }
+      return a;
+    }, '');
   };
 
   return (
@@ -52,7 +66,7 @@ function App() {
         With two or more screens you can send and receive the text messages.
         Attention: sent messages are not saved.
       </p>
-      <div className='bg-zinc-900 p-10 app-container'>
+      <div className='bg-zinc-900 p-7 app-container inputs'>
         <label htmlFor='name'>
           User Name
           <input
@@ -60,14 +74,19 @@ function App() {
             type='text'
             name='name'
             id='name'
-            placeholder='Insert your name'
+            placeholder='Your name > 2 and < 14'
             value={name}
-            onChange={({ target: { value } }) => setName(value)}
+            onChange={({ target: { value } }) => {
+              value.length < MAX_NAME && setName(value);
+              setIsDisabled(!(value.length > 2));
+              setBtnDisabled(!(value.length > 2 && message.length > 0));
+            }}
           />
         </label>
-        <label htmlFor='text-ccontent' className='pass-container'>
+        <label htmlFor='text-ccontent' className='message-container'>
           Message
           <textarea
+            disabled={isDisabled}
             autoComplete='off'
             rows='2'
             cols='25'
@@ -76,18 +95,27 @@ function App() {
             type={'text'}
             name='message'
             id='message'
-            placeholder='message'
+            placeholder='Insert a name to white a message'
             style={{ resize: 'none', padding: '5px', color: 'black' }}
-            onChange={({ target: { value } }) =>
-              value !== '\n' && setMessage(value)
-            }
+            onChange={({ target: { value } }) => {
+              value !== '\n' && value.length <= MAX_LENG && setMessage(value);
+              setBtnDisabled(!(value.length > 0 && name.length > 2));
+            }}
           />
+          <div className='count'>{MAX_LENG - message.length}</div>
         </label>
-        <button type='button' onClick={handleClick}>
+        <button type='button' onClick={handleClick} disabled={btnDisabled}>
           Enviar
         </button>
+        <a
+          href='https://github.com/Megas-MDN/chat-react-socketio'
+          target={'_blank'}
+          rel='noreferrer'
+        >
+          <FaGithub size={35} className='icon' />
+        </a>
       </div>
-      <div className='chat-container'>
+      <div className='chat-container bg-zinc-900'>
         {chat.map(({ body, from, id }, i) => (
           <div
             key={id + i}
